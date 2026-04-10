@@ -1,0 +1,57 @@
+---
+title: "Shopping cart: manage your in-store list"
+description: "Use nHungry's Cart tab to shop by supermarket, mark items as bought with an undo option, and clear your list when you finish shopping."
+---
+
+The **Cart** tab is your companion at the store. It shows only the products you have actively selected for this shopping trip, grouped by whether they belong to the current supermarket, another store, or have already been purchased. When the cart is empty, a full-screen message confirms there is nothing to buy yet.
+
+## Shopping workflow
+
+<Steps>
+  <Step title="Select products for your trip">
+    In the **A–Z** or **Categories** view, tap each product you need to buy. Tapping sets `selected: true` and adds the product to the cart.
+  </Step>
+  <Step title="Open the Cart tab">
+    Tap the cart icon in the bottom navigation bar. You'll see all selected products organised into sections.
+  </Step>
+  <Step title="Choose a supermarket (if applicable)">
+    If more than one supermarket is visible in your settings, a dropdown appears at the top of the screen. Select the store you are currently in. The cart reorganises to show products for that store first.
+  </Step>
+  <Step title="Work through the current supermarket section">
+    The **"Puedes comprar en [supermarket]"** section lists products assigned to the selected supermarket plus any products assigned to **Cualquier Supermercado** (id 0). Tap a product to mark it as bought.
+  </Step>
+  <Step title="Check other supermarkets">
+    If you have selected products assigned to other visible supermarkets, they appear in a separate **"Puedes comprar en otros supermercados"** section below. These are not hidden — they are just set aside so you can focus on the current store.
+  </Step>
+  <Step title="Review purchased products">
+    Products you have marked as bought move to the **"Productos comprados"** section at the bottom of the cart. They remain there until you clear the list.
+  </Step>
+  <Step title="Clear the list when done">
+    Tap **Limpiar Lista** to remove products from the cart. See [Clearing the list](#clearing-the-list) below for the confirmation options.
+  </Step>
+</Steps>
+
+## Marking a product as bought
+
+Tap any product in the current or other-supermarkets section to mark it as purchased (`done: true`). The product moves immediately to the **Purchased products** section.
+
+<Note>
+  An **Undo** notification appears for 500 ms after marking a product as bought. Tap **Deshacer** within that window to revert the action. Once the notification disappears the action can only be undone by tapping the product again in the Purchased products section.
+</Note>
+
+## Clearing the list
+
+Tap **Limpiar Lista** in the top-right corner. The confirmation dialog that appears depends on the current state of your cart:
+
+- **Only purchased items in cart** — a single confirmation clears all purchased products, removing their `selected` and `done` flags.
+- **Mix of purchased and pending items** — a three-option dialog appears: clear **Todos** (all selected products), clear only **Ya Comprados** (purchased only), or **Cancelar**.
+- **Clearing items that haven't been bought yet** — if you choose to clear all and there are still unbought items, a second confirmation dialog asks you to confirm deletion of those pending products before proceeding.
+
+<CardGroup cols={2}>
+  <Card title="Browse and select products" icon="list" href="/using-the-app/browsing-products">
+    Learn how to select products for the cart in the A–Z and Categories views.
+  </Card>
+  <Card title="Categories and supermarkets" icon="store" href="/using-the-app/categories-and-supermarkets">
+    Control which supermarkets appear in the cart filter dropdown.
+  </Card>
+</CardGroup>

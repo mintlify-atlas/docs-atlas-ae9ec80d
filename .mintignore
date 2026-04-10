@@ -5,3 +5,9 @@
 # Draft content
 drafts/
 *.draft.mdx
+
+# Legacy starter kit files (not part of nHungry docs)
+essentials/
+api-reference/
+ai-tools/
+development.mdx

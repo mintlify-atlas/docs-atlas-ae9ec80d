@@ -1,0 +1,91 @@
+{
+  "projectType": "saas",
+  "projectName": "nHungry",
+  "projectDescription": "A Nuxt.js-powered progressive web app for managing your shopping list, with category and supermarket organization, cloud sync, and offline support.",
+  "theme": "almond",
+  "primaryColor": "#64748c",
+  "lightColor": "#04db83",
+  "darkColor": "#040404",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "quickstart",
+              "installation"
+            ]
+          },
+          {
+            "group": "Using the App",
+            "pages": [
+              "using-the-app/adding-products",
+              "using-the-app/browsing-products",
+              "using-the-app/shopping-cart",
+              "using-the-app/categories-and-supermarkets"
+            ]
+          },
+          {
+            "group": "Configuration",
+            "pages": [
+              "configuration/app-settings",
+              "configuration/import-export",
+              "configuration/pwa-offline"
+            ]
+          },
+          {
+            "group": "Account & Sync",
+            "pages": [
+              "account/registration-login",
+              "account/cloud-sync",
+              "account/fingerprint-auth"
+            ]
+          },
+          {
+            "group": "Development",
+            "pages": [
+              "development/architecture",
+              "development/composables",
+              "development/store",
+              "development/api-service"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Shopping list management with per-product category and supermarket assignment",
+    "Alphabetical (A-Z) and category-grouped product browsing views",
+    "Shopping cart view with supermarket filtering and purchased-item tracking",
+    "20 color-coded, renameable product categories",
+    "Multiple supermarket support with drag-and-drop ordering and visibility control",
+    "Progressive Web App (PWA) with offline support and service worker caching",
+    "Cloud sync via REST API with JWT-based authentication",
+    "FingerprintJS device identification for secure multi-device login",
+    "Import/export configuration as JSON files",
+    "Responsive design built with Bootstrap 5 and Vue 3"
+  ],
+  "publicApiSurface": [
+    "myStore() — central Pinia-like reactive store composable",
+    "useAuth() — login, register, logout composable",
+    "useSync() — syncWithServer(), isSyncing, syncStatus",
+    "useFingerprint() — device fingerprint identification",
+    "useDraggable() — drag-and-drop ordering for supermarkets",
+    "useMyInputModal() — reusable text input modal",
+    "useMyProductEditModal() — product edit modal composable",
+    "useProductFilter() — product list filtering logic",
+    "localStorageService — getItem/setItem/getSubItem/setSubItem/importData/exportData/migrateOldData",
+    "apiService — login(), register(), syncData(), getAll(), newProducto(), updateProducto(), deleteProducto()",
+    "POST /login — authenticate user",
+    "POST /register — register new user",
+    "POST /syncData — sync local data with server",
+    "GET /getAll — fetch all user data from server",
+    "POST /newProducto — create product on server",
+    "POST /updateProducto — update product on server",
+    "POST /deleteProducto — delete product from server"
+  ]
+}

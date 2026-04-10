@@ -1,0 +1,107 @@
+---
+title: "Install nHungry as a PWA (offline support)"
+description: "Install nHungry as a progressive web app on your phone or desktop and use it without an internet connection — your data stays local until you sync."
+---
+
+Installing nHungry as a Progressive Web App (PWA) adds it to your home screen or taskbar like a native app. Once installed, nHungry works fully offline — you can add products, browse your list, and mark items as bought without any internet connection. All changes are saved to your device's local storage and synced to the cloud the next time you connect (if you have an account).
+
+Offline mode activates automatically when nHungry detects there is no network connection. You do not need to do anything special — the app switches to cached assets and local data seamlessly.
+
+<Note>
+  PWA features (offline support, home screen installation) are only available when using the production build of nHungry deployed to a web server. They do not work on the local development server (`npm run dev`).
+</Note>
+
+## Installing nHungry
+
+<Tabs>
+  <Tab title="Android">
+    **Using Chrome or another Chromium browser:**
+
+    <Steps>
+      <Step title="Open nHungry in your browser">
+        Navigate to [hungry.infoinnova.es](https://hungry.infoinnova.es) in Chrome or a Chromium-based browser on Android.
+      </Step>
+      <Step title="Accept the install prompt">
+        Chrome shows a banner or a bell icon at the bottom of the screen asking if you want to add nHungry to your home screen. Tap **Add** or **Install**.
+
+        If the prompt does not appear automatically, tap the three-dot menu in the top-right corner and select **Add to Home screen**.
+      </Step>
+      <Step title="Confirm installation">
+        Tap **Add** on the confirmation dialog. A shortcut icon labeled "nHungry" will appear on your home screen.
+      </Step>
+      <Step title="Launch from home screen">
+        Tap the nHungry icon. The app opens in standalone mode (without the browser address bar), matching the native app experience.
+      </Step>
+    </Steps>
+  </Tab>
+  <Tab title="iOS / Safari">
+    **Using Safari on iPhone or iPad:**
+
+    <Steps>
+      <Step title="Open nHungry in Safari">
+        Navigate to [hungry.infoinnova.es](https://hungry.infoinnova.es) in Safari. PWA installation is only supported in Safari on iOS — other iOS browsers cannot install PWAs.
+      </Step>
+      <Step title="Open the Share menu">
+        Tap the **Share** button (the square with an arrow pointing up) in the Safari toolbar at the bottom of the screen.
+      </Step>
+      <Step title="Tap Add to Home Screen">
+        Scroll down in the Share sheet and tap **Add to Home Screen**.
+      </Step>
+      <Step title="Confirm the name and add">
+        Optionally edit the display name, then tap **Add** in the top-right corner. The nHungry icon appears on your home screen.
+      </Step>
+      <Step title="Launch from home screen">
+        Tap the nHungry icon to open the app in fullscreen mode without the Safari browser chrome.
+      </Step>
+    </Steps>
+  </Tab>
+  <Tab title="Desktop">
+    **Using Chrome or Edge on Windows, macOS, or Linux:**
+
+    <Steps>
+      <Step title="Open nHungry in Chrome or Edge">
+        Navigate to [hungry.infoinnova.es](https://hungry.infoinnova.es).
+      </Step>
+      <Step title="Click the install icon">
+        Look for the install icon in the browser's address bar — a computer monitor with a download arrow (Chrome) or a plus sign inside a box (Edge). Click it.
+
+        If the icon is not visible, open the browser menu (three dots) and look for **Install nHungry** or **Apps > Install this site as an app**.
+      </Step>
+      <Step title="Confirm installation">
+        Click **Install** in the dialog that appears. nHungry will open in its own window and a shortcut will be added to your taskbar or applications folder.
+      </Step>
+    </Steps>
+  </Tab>
+</Tabs>
+
+## What works offline
+
+Once installed, nHungry caches the following asset types so the app loads without a network connection:
+
+- JavaScript bundles (`.js`)
+- Stylesheets (`.css`)
+- HTML files (`.html`)
+- Images: PNG (`.png`), SVG (`.svg`), and ICO (`.ico`) files
+
+All product, category, supermarket, and settings data is stored in your browser's `localStorage` under the key `hungryConfigData`. This data persists independently of any network connection.
+
+Images hosted on ImageKit (`ik.imagekit.io`) — such as supermarket logos — are cached separately with a 24-hour expiry using a network-first strategy. They are served from cache when offline and refreshed when you are back online.
+
+## What requires an internet connection
+
+The following features are not available offline:
+
+- **Initial registration and login** — creating or authenticating an account requires a server connection.
+- **Cloud sync** — pushing or pulling data from the server requires network access. All local changes are queued and can be synced manually once you reconnect. See [Sync your data across devices](/account/cloud-sync).
+
+## PWA manifest details
+
+| Property | Value |
+|----------|-------|
+| App name | nHungry - Lista de la Compra |
+| Short name | nHungry |
+| Theme color | `#4CAF50` |
+| Icon sizes | 192×192 px, 512×512 px |
+| Display mode | Standalone |
+
+The theme color (`#4CAF50`, a medium green) is applied to the browser toolbar and the status bar on Android when the app is installed.

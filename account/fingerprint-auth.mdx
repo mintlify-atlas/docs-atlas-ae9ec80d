@@ -1,0 +1,47 @@
+---
+title: "Device fingerprinting in nHungry"
+description: "How nHungry uses FingerprintJS to generate a compact device identifier, stored locally and sent with every login, register, and sync request."
+---
+
+Device fingerprinting gives the nHungry server a way to identify which device a request is coming from, independently of the user's session token. nHungry uses the open-source `@fingerprintjs/fingerprintjs` library to generate a compact, unique identifier for your browser or device. This identifier travels with every login and register request so the server can associate activity with a specific trusted device.
+
+<Info>
+  The device fingerprint is a supplementary identifier, not a replacement for your password. Authentication still requires a valid email and password — the fingerprint simply tells the server which device is being used.
+</Info>
+
+## How the fingerprint is generated
+
+When nHungry loads for the first time, `useFingerprint` runs automatically. It calls `FingerprintJS.load()`, collects browser signals, and compacts the resulting visitor ID into a shorter string. This compacted value is stored as `fingerID` in `loginData`, which is persisted in localStorage under the key `hungryConfigData`.
+
+On subsequent loads, if a `fingerID` already exists in the store, the library is not re-invoked — the stored value is used directly.
+
+## Where the fingerprint is used
+
+- **Login and register requests** — sent as the `fingerID` field in the request body to `POST /login` and `POST /register`.
+- **Sync requests** — included in the `POST /syncData` payload alongside the email and token.
+- **Config tab header** — displayed in the header of the **Config** tab alongside the app version, in the format `<fingerID> - v<version>`.
+
+<Note>
+  The fingerID shown in the **Config** tab header is your current device's identifier. It is formatted as `<fingerID> - v<version>`, for example: `a1b2c3d4 - v1.0.0`.
+</Note>
+
+## Persistence across logouts
+
+The fingerprint persists when you log out. Logging out clears your email and session token, but `loginData.fingerID` is preserved. This means the server can still recognise the device the next time you log in, without needing to regenerate the fingerprint.
+
+The fingerprint is only cleared if you perform a full app reset (for example, clearing all site data in your browser).
+
+## Privacy
+
+The fingerprint is a hash derived from publicly available browser signals. No personally identifiable information — such as your name, location, or browsing history — is included in or derivable from the fingerprint value. The fingerprint is sent only to the nHungry API server (`https://infoinnova.es/lolo/api`) and is not shared with any third party.
+
+## Frequently asked questions
+
+<AccordionGroup>
+  <Accordion title="What happens if I clear my browser data?">
+    Clearing your browser's site data removes `hungryConfigData` from localStorage, which includes your stored `fingerID`. The next time nHungry loads, FingerprintJS will generate a new fingerprint. Because the device fingerprint has changed, the server will see it as a new device. You may need to log in again and re-sync your data.
+  </Accordion>
+  <Accordion title="Is my fingerprint shared with third parties?">
+    No. The fingerprint is only sent to the nHungry API server as part of login, register, and sync requests. It is not transmitted to FingerprintJS servers, analytics platforms, or any other third party.
+  </Accordion>
+</AccordionGroup>

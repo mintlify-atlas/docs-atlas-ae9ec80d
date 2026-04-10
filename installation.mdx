@@ -1,0 +1,151 @@
+---
+title: "Install and run nHungry locally"
+description: "Set up a local development environment for nHungry, from cloning the repository to running the dev server and building for production."
+---
+
+The hosted app at [hungry.infoinnova.es](https://hungry.infoinnova.es) is the easiest way to use nHungry. Run it locally if you want to contribute to the codebase, self-host your own instance, or explore how the app works under the hood.
+
+## Prerequisites
+
+- **Node.js** 18 or later
+- A package manager: npm, pnpm, yarn, or bun
+
+## Setup
+
+<Steps>
+  <Step title="Clone the repository">
+    ```bash
+    git clone https://github.com/Trystan4861/nHungry.git
+    cd nHungry
+    ```
+  </Step>
+
+  <Step title="Install dependencies">
+    <CodeGroup>
+
+    ```bash npm
+    npm install
+    ```
+
+    ```bash pnpm
+    pnpm install
+    ```
+
+    ```bash yarn
+    yarn install
+    ```
+
+    ```bash bun
+    bun install
+    ```
+
+    </CodeGroup>
+
+    This also runs `nuxt prepare` automatically via the `postinstall` script, which generates the Nuxt type declarations.
+  </Step>
+
+  <Step title="Start the development server">
+    <CodeGroup>
+
+    ```bash npm
+    npm run dev
+    ```
+
+    ```bash pnpm
+    pnpm dev
+    ```
+
+    ```bash yarn
+    yarn dev
+    ```
+
+    ```bash bun
+    bun run dev
+    ```
+
+    </CodeGroup>
+
+    The server starts on [http://localhost:3000](http://localhost:3000) and is accessible on your local network (the `--host` flag is included in the dev script).
+
+    <Note>
+      PWA features — including service worker registration, offline support, and the "Add to home screen" prompt — are only active in the production build. They are intentionally disabled in development mode to avoid caching issues during development.
+    </Note>
+  </Step>
+</Steps>
+
+## Build for production
+
+To build and preview a production version locally:
+
+<Steps>
+  <Step title="Build the app">
+    <CodeGroup>
+
+    ```bash npm
+    npm run build
+    ```
+
+    ```bash pnpm
+    pnpm build
+    ```
+
+    ```bash yarn
+    yarn build
+    ```
+
+    ```bash bun
+    bun run build
+    ```
+
+    </CodeGroup>
+
+    Nuxt outputs the production bundle to `.output/`. The build uses Terser to minify and strip console statements.
+  </Step>
+
+  <Step title="Preview the production build">
+    <CodeGroup>
+
+    ```bash npm
+    npm run preview
+    ```
+
+    ```bash pnpm
+    pnpm preview
+    ```
+
+    ```bash yarn
+    yarn preview
+    ```
+
+    ```bash bun
+    bun run preview
+    ```
+
+    </CodeGroup>
+
+    This serves the `.output/` directory locally so you can test the production build, including PWA registration and offline behaviour, before deploying.
+  </Step>
+</Steps>
+
+## Configuration notes
+
+- **SSR is disabled** — nHungry is a fully client-side app (`ssr: false` in `nuxt.config.ts`). All data is read from and written to LocalStorage in the browser.
+- **PWA in production only** — The `@vite-pwa/nuxt` module is conditionally loaded only when `NODE_ENV === 'production'`. Running `npm run preview` after a build is the correct way to test PWA features locally.
+- **TypeScript strict mode** is enabled. Run `nuxt prepare` if your editor reports missing type declarations after cloning.
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Architecture" icon="sitemap" href="/development/architecture">
+    Understand how the app is structured and how components relate to each other.
+  </Card>
+  <Card title="Store and composables" icon="database" href="/development/store">
+    Learn how state is managed with the central store.
+  </Card>
+  <Card title="PWA and offline" icon="wifi-slash" href="/configuration/pwa-offline">
+    Learn how the service worker and offline caching are configured.
+  </Card>
+  <Card title="Import and export" icon="file-arrow-up" href="/configuration/import-export">
+    Back up or migrate your data using the import/export feature.
+  </Card>
+</CardGroup>

@@ -1,0 +1,524 @@
+---
+title: "Composables reference for nHungry"
+description: "Full reference for all Vue composables in nHungry, covering auth, cloud sync, device fingerprinting, UI modals, drag-and-drop, and utilities."
+---
+
+Composables are plain TypeScript functions that encapsulate reactive logic using Vue's Composition API. In nHungry every major behaviour — authentication, syncing, product filtering, modals, drag-and-drop ordering — lives in a dedicated composable under `composables/`. Each composable is imported directly into the component or page that needs it; no plugin registration or global injection is required.
+
+<Note>
+  `useStore()` is documented separately on the [useStore reference](/development/store) page. The entry below links to that page and summarises its role.
+</Note>
+
+<AccordionGroup>
+
+  <Accordion title="useStore()">
+
+`useStore()` (exported as `myStore`) is the single source of global reactive state for the entire application. It is built on Nuxt's `useState()` primitive, which provides SSR-safe shared refs without Pinia.
+
+```typescript
+import { myStore } from '~/composables/useStore';
+
+const store = myStore();
+
+// Read reactive state
+console.log(store.productos.value);
+
+// Call an action
+store.addProduct('Milk', 0, 1);
+```
+
+See the [useStore reference](/development/store) for the complete API.
+
+  </Accordion>
+
+  <Accordion title="useAuth()">
+
+Manages login, registration, and logout using the API service and SweetAlert2 dialogs. Passwords are MD5-hashed on the client before they are sent to the server.
+
+**Signature**
+
+```typescript
+function useAuth(): {
+  showRegisterMessage: Ref<boolean>;
+  dll: Ref<string>;
+  handleForgetPass: () => void;
+  handleRegister: () => void;
+  handleLogin: () => void;
+}
+```
+
+**Return values**
+
+| Name | Type | Description |
+|---|---|---|
+| `showRegisterMessage` | `Ref<boolean>` | `true` when the dialog is in login mode, `false` when in register mode. |
+| `dll` | `Ref<string>` | DOM element ID used to move the login links between containers during the SweetAlert2 lifecycle. |
+| `handleForgetPass` | `() => void` | Placeholder for the forgot-password flow (not yet implemented). |
+| `handleRegister` | `() => void` | Toggles the SweetAlert2 dialog between login and register mode. |
+| `handleLogin` | `() => void` | Opens the login/register dialog if the user is logged out, or opens the logout confirmation if logged in. |
+
+**Usage example**
+
+```typescript
+import { useAuth } from '~/composables/useAuth';
+
+const { handleLogin, handleRegister, showRegisterMessage } = useAuth();
+
+// Open login dialog or logout confirmation
+handleLogin();
+
+// Toggle between login and register inside the dialog
+handleRegister();
+```
+
+  </Accordion>
+
+  <Accordion title="useSync()">
+
+Handles bidirectional data synchronisation with the backend. Exports the local store data, sends it to `POST /syncData`, and imports the merged response back into the store.
+
+**Signature**
+
+```typescript
+function useSync(): {
+  syncWithServer: () => Promise<boolean>;
+  isSyncing: Ref<boolean>;
+  lastSyncTime: Ref<number | null>;
+  syncStatus: Ref<'idle' | 'syncing' | 'success' | 'error'>;
+}
+```
+
+**Return values**
+
+| Name | Type | Description |
+|---|---|---|
+| `syncWithServer` | `() => Promise<boolean>` | Triggers a full sync cycle. Returns `true` on success, `false` on failure. |
+| `isSyncing` | `Ref<boolean>` | `true` while the sync HTTP request is in flight. |
+| `lastSyncTime` | `Ref<number \| null>` | Unix timestamp (ms) of the last successful sync, or `null`. |
+| `syncStatus` | `Ref<'idle' \| 'syncing' \| 'success' \| 'error'>` | Current sync lifecycle state. |
+
+**Usage example**
+
+```typescript
+import { useSync } from '~/composables/useSync';
+
+const { syncWithServer, isSyncing, syncStatus } = useSync();
+
+async function onSyncButtonClick() {
+  const ok = await syncWithServer();
+  if (!ok) {
+    console.error('Sync failed, status:', syncStatus.value);
+  }
+}
+```
+
+<Warning>
+  `syncWithServer()` returns `false` immediately if the user is not logged in. Check `store.loginData.value.logged` before calling it.
+</Warning>
+
+  </Accordion>
+
+  <Accordion title="useFingerprint()">
+
+Generates a compact device fingerprint using `@fingerprintjs/fingerprintjs` and stores the result in the global store. The fingerprint is sent with every auth request so the server can associate sessions with devices.
+
+**Signature**
+
+```typescript
+function useFingerprint(): {
+  fingerID: Ref<string>;
+  getFingerprint: () => Promise<string>;
+}
+```
+
+**Return values**
+
+| Name | Type | Description |
+|---|---|---|
+| `fingerID` | `Ref<string>` | The current device fingerprint string. Initialised from the store on setup; updated after `getFingerprint()` resolves. |
+| `getFingerprint` | `() => Promise<string>` | Loads FingerprintJS, computes the visitor ID, compacts it, and writes it to both `fingerID` and the store. |
+
+The composable calls `getFingerprint()` automatically in `onMounted` if `fingerID` is not already set.
+
+**Usage example**
+
+```typescript
+import { useFingerprint } from '~/composables/useFingerprint';
+
+const { fingerID } = useFingerprint();
+
+// fingerID.value is ready after onMounted resolves
+console.log('Device ID:', fingerID.value);
+```
+
+  </Accordion>
+
+  <Accordion title="useDraggable(items, options)">
+
+Wraps `vuedraggable` with opinionated defaults for list reordering. Supports an optional fixed-first-item constraint (used for the "Any supermarket" entry with `id === 0`).
+
+**Signature**
+
+```typescript
+function useDraggable<T extends { id: number }>(
+  initialItems: T[],
+  options?: {
+    fixedFirstItem?: boolean;
+    onOrderChange?: (items: T[]) => void;
+  }
+): {
+  orderedItems: Ref<T[]>;
+  onDragStart: (evt: DraggableEvent) => void;
+  onDragEnd: (evt: DraggableEvent) => void;
+  checkMove: (evt: DraggableEvent) => boolean;
+}
+```
+
+**Parameters**
+
+| Name | Type | Description |
+|---|---|---|
+| `initialItems` | `T[]` | Initial array of items. Each item must have a numeric `id` property. |
+| `options.fixedFirstItem` | `boolean` | When `true`, prevents the item with `id === 0` from being moved or displaced. |
+| `options.onOrderChange` | `(items: T[]) => void` | Callback fired after every completed drag-and-drop. Receives the updated array. |
+
+**Return values**
+
+| Name | Type | Description |
+|---|---|---|
+| `orderedItems` | `Ref<T[]>` | Reactive copy of the item array. Bind to `vuedraggable`'s `v-model`. |
+| `onDragStart` | handler | Cancels the drag if the dragged item has `id === 0` and `fixedFirstItem` is `true`. |
+| `onDragEnd` | handler | Fires `onOrderChange` with the new order. |
+| `checkMove` | handler | Returns `false` to block moves that would displace the fixed first item. |
+
+**Usage example**
+
+```typescript
+import { useDraggable } from '~/composables/useDraggable';
+import { myStore } from '~/composables/useStore';
+
+const store = myStore();
+
+const { orderedItems, onDragEnd, checkMove } = useDraggable(
+  store.supermercados.value,
+  {
+    fixedFirstItem: true,
+    onOrderChange: (items) => store.updateSupermercadosOrder(items)
+  }
+);
+```
+
+  </Accordion>
+
+  <Accordion title="useMyInputModal()">
+
+Programmatically mounts a `MyInputModal` Vue component into the DOM and returns a promise that resolves when the user confirms or cancels. The component is unmounted and its container element removed after the promise resolves.
+
+**Signature**
+
+```typescript
+function useMyInputModal(): {
+  showModal: (
+    title: string,
+    initialValue?: string,
+    placeholder?: string,
+    confirmText?: string,
+    cancelText?: string
+  ) => Promise<{ confirmed: boolean; value: string }>;
+}
+```
+
+**`showModal` parameters**
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `title` | `string` | — | Modal heading text. |
+| `initialValue` | `string` | `''` | Pre-filled value in the input field. |
+| `placeholder` | `string` | `''` | Placeholder text for the input field. |
+| `confirmText` | `string` | `'Aceptar'` | Label for the confirm button. |
+| `cancelText` | `string` | `'Cancelar'` | Label for the cancel button. |
+
+**`showModal` return value**
+
+| Field | Type | Description |
+|---|---|---|
+| `confirmed` | `boolean` | `true` if the user clicked the confirm button. |
+| `value` | `string` | The text entered by the user, or `initialValue` if cancelled. |
+
+**Usage example**
+
+```typescript
+import { useMyInputModal } from '~/composables/useMyInputModal';
+
+const { showModal } = useMyInputModal();
+
+const result = await showModal('Rename category', 'Dairy', 'Enter new name');
+if (result.confirmed) {
+  store.updateCategoria(id, result.value);
+}
+```
+
+  </Accordion>
+
+  <Accordion title="useMyProductEditModal()">
+
+Programmatically mounts a `MyProductEditModal` component and resolves with the edited product data when the user confirms. Works identically to `useMyInputModal()` but operates on a full `Producto` object.
+
+**Signature**
+
+```typescript
+function useMyProductEditModal(): {
+  showModal: (
+    product: Producto,
+    title?: string,
+    confirmText?: string,
+    cancelText?: string
+  ) => Promise<{ confirmed: boolean; updatedProduct: Partial<Producto> }>;
+}
+```
+
+**`showModal` parameters**
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `product` | `Producto` | — | The product to edit. Passed as the initial state of the form. |
+| `title` | `string` | `'Editar Producto'` | Modal heading text. |
+| `confirmText` | `string` | `'Aceptar'` | Label for the confirm button. |
+| `cancelText` | `string` | `'Cancelar'` | Label for the cancel button. |
+
+**`showModal` return value**
+
+| Field | Type | Description |
+|---|---|---|
+| `confirmed` | `boolean` | `true` if the user confirmed the edit. |
+| `updatedProduct` | `Partial<Producto>` | Fields changed by the user. Empty object `{}` if cancelled. |
+
+**Usage example**
+
+```typescript
+import { useMyProductEditModal } from '~/composables/useMyProductEditModal';
+
+const { showModal } = useMyProductEditModal();
+
+const { confirmed, updatedProduct } = await showModal(product);
+if (confirmed) {
+  store.updateProduct(product.id, updatedProduct);
+}
+```
+
+  </Accordion>
+
+  <Accordion title="useProductFilter(getProducts)">
+
+Provides reactive product search. Accepts a getter function (returning `Producto[]`) so it can react to changes in any filtered or sorted list.
+
+**Signature**
+
+```typescript
+function useProductFilter(getProducts: () => Producto[]): {
+  showFinder: Ref<boolean>;
+  idInput: string;
+  finder: Ref<string>;
+  filteredProducts: ComputedRef<Producto[]>;
+  toggleFinder: () => void;
+  handleUpdateValue: (value: string) => void;
+  updateFilter: () => void;
+}
+```
+
+**Return values**
+
+| Name | Type | Description |
+|---|---|---|
+| `showFinder` | `Ref<boolean>` | Whether the search input is currently visible. |
+| `idInput` | `string` | Fixed DOM ID (`"finder"`) for the search input element. |
+| `finder` | `Ref<string>` | Current search query string. |
+| `filteredProducts` | `ComputedRef<Producto[]>` | Derived list of products matching the current query. |
+| `toggleFinder` | `() => void` | Shows or hides the search bar. Clears the query when hiding. |
+| `handleUpdateValue` | `(value: string) => void` | Call this on input events to update `finder` and re-run the filter. |
+| `updateFilter` | `() => void` | Manually re-applies the filter (also called automatically by a watcher). |
+
+Search is accent- and case-insensitive via a `normalizeText` utility.
+
+**Usage example**
+
+```typescript
+import { useProductFilter } from '~/composables/useProductFilter';
+import { myStore } from '~/composables/useStore';
+
+const store = myStore();
+
+const {
+  showFinder,
+  filteredProducts,
+  toggleFinder,
+  handleUpdateValue
+} = useProductFilter(() => store.sortedA2Z.value);
+```
+
+  </Accordion>
+
+  <Accordion title="useFormChanges(initialState)">
+
+Tracks which fields in a form have been modified since the last save. Useful for showing "save" buttons only when something has changed and for triggering targeted save callbacks per field.
+
+**Signature**
+
+```typescript
+function useFormChanges<T extends Record<string, boolean>>(initialState: T): {
+  changes: Ref<T>;
+  markAsChanged: (field: keyof T) => void;
+  hasChanges: () => boolean;
+  resetChanges: () => void;
+  saveChanges: (saveCallbacks: Record<keyof T, () => void>) => void;
+}
+```
+
+**Return values**
+
+| Name | Type | Description |
+|---|---|---|
+| `changes` | `Ref<T>` | Object where each key maps to a boolean indicating whether that field has unsaved changes. |
+| `markAsChanged` | `(field: keyof T) => void` | Sets `changes.value[field]` to `true`. |
+| `hasChanges` | `() => boolean` | Returns `true` if any field is marked as changed. |
+| `resetChanges` | `() => void` | Sets all fields back to `false`. |
+| `saveChanges` | `(callbacks) => void` | Executes the callback for each changed field, shows a success toast, then calls `resetChanges()`. |
+
+**Usage example**
+
+```typescript
+import { useFormChanges } from '~/composables/useFormChanges';
+
+const { changes, markAsChanged, saveChanges } = useFormChanges({
+  appName: false,
+  maxLength: false,
+  defaultTab: false,
+});
+
+// When the user edits the app name field:
+markAsChanged('appName');
+
+// When the user clicks Save:
+saveChanges({
+  appName: () => store.appName.value = localAppName.value,
+  maxLength: () => store.maxLenght.value = localMaxLength.value,
+  defaultTab: () => store.setDefaultTabActive(localTab.value),
+});
+```
+
+  </Accordion>
+
+  <Accordion title="useLetterIndicator(scrollContainerRef)">
+
+Displays a floating letter badge that updates as the user scrolls through an alphabetically sorted product list. The badge appears for 1 second then fades out.
+
+**Signature**
+
+```typescript
+function useLetterIndicator(scrollContainerRef: Ref<HTMLElement | null>): {
+  letraActualRef: Ref<HTMLElement | null>;
+  letraActual: Ref<string>;
+  showLetraActual: Ref<boolean>;
+}
+```
+
+**Parameters**
+
+| Name | Type | Description |
+|---|---|---|
+| `scrollContainerRef` | `Ref<HTMLElement \| null>` | A template ref pointing to the scrollable container that holds the product list. |
+
+**Return values**
+
+| Name | Type | Description |
+|---|---|---|
+| `letraActualRef` | `Ref<HTMLElement \| null>` | Template ref for the letter badge element itself (used to determine vertical position). |
+| `letraActual` | `Ref<string>` | The uppercase first letter of the topmost visible product name. |
+| `showLetraActual` | `Ref<boolean>` | Controls the visibility of the letter badge. Toggled by the scroll handler with a 1-second auto-hide timeout. |
+
+The composable attaches a passive `scroll` listener in `onMounted`.
+
+**Usage example**
+
+```typescript
+import { useLetterIndicator } from '~/composables/useLetterIndicator';
+import { ref } from 'vue';
+
+const scrollContainer = ref<HTMLElement | null>(null);
+const { letraActualRef, letraActual, showLetraActual } = useLetterIndicator(scrollContainer);
+```
+
+  </Accordion>
+
+  <Accordion title="useUserData()">
+
+Fetches the complete user dataset from the server (`GET /getAll`) and provides a utility to compare it with local data. Used to decide whether to prompt the user about conflicting changes before syncing.
+
+**Signature**
+
+```typescript
+function useUserData(): {
+  fetchUserData: () => Promise<ImportData>;
+  compareData: (serverData: ImportData) => {
+    hasChanges: boolean;
+    serverNewer: boolean;
+    differences: {
+      productos: { local: number; server: number };
+      categorias: { local: number; server: number };
+      supermercados: { local: number; server: number };
+    };
+  };
+  isLoading: Ref<boolean>;
+  error: Ref<string | null>;
+  serverData: Ref<ImportData | null>;
+  lastFetchTime: Ref<number | null>;
+}
+```
+
+**Return values**
+
+| Name | Type | Description |
+|---|---|---|
+| `fetchUserData` | `() => Promise<ImportData>` | Calls `GET /getAll` and transforms the response into `ImportData`. Rejects if the user is not logged in or the request fails. |
+| `compareData` | `(serverData) => object` | Compares product, category, and supermarket counts between local and server data. |
+| `isLoading` | `Ref<boolean>` | `true` while `fetchUserData` is awaiting a response. |
+| `error` | `Ref<string \| null>` | Last error message, or `null` if no error. |
+| `serverData` | `Ref<ImportData \| null>` | The most recently fetched server dataset. |
+| `lastFetchTime` | `Ref<number \| null>` | Unix timestamp (ms) of the last successful fetch. |
+
+**Usage example**
+
+```typescript
+import { useUserData } from '~/composables/useUserData';
+
+const { fetchUserData, compareData, isLoading } = useUserData();
+
+const serverData = await fetchUserData();
+const { hasChanges, serverNewer, differences } = compareData(serverData);
+
+if (hasChanges) {
+  console.log('Produtos — local:', differences.productos.local,
+                        'server:', differences.productos.server);
+}
+```
+
+  </Accordion>
+
+</AccordionGroup>
+
+## Related pages
+
+<CardGroup cols={2}>
+  <Card title="useStore reference" icon="database" href="/development/store">
+    Complete API for global state, computed values, and actions.
+  </Card>
+  <Card title="REST API endpoints" icon="server" href="/development/api-service">
+    Backend endpoint documentation consumed by the composables above.
+  </Card>
+  <Card title="Architecture overview" icon="sitemap" href="/development/architecture">
+    How all composables fit into the broader application structure.
+  </Card>
+  <Card title="Fingerprint auth" icon="fingerprint" href="/account/fingerprint-auth">
+    How device fingerprinting works from a user perspective.
+  </Card>
+</CardGroup>

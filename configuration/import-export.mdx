@@ -1,0 +1,134 @@
+---
+title: "Import and export your nHungry data"
+description: "Back up and restore your nHungry shopping list configuration as a JSON file, including all products, categories, supermarkets, and app settings."
+---
+
+Exporting your nHungry data creates a JSON file containing everything — your products, categories, supermarkets, and app settings — that you can save as a backup or transfer to another device. Importing a file from a previous export restores all that data in one step. This is useful before a device change, when sharing a category setup with someone else, or as a manual backup before making major changes.
+
+<Tip>
+  If you use nHungry across multiple devices regularly, cloud sync is a more convenient option than manual export. See [Sync your data across devices](/account/cloud-sync) for details.
+</Tip>
+
+## Exporting your configuration
+
+Clicking **Export Configuration** in the Config tab downloads a file named `hungry_config_<date>.json` (for example, `hungry_config_2024-03-15.json`) to your device.
+
+The exported file contains:
+
+- All products with their categories, supermarkets, amounts, and selection state
+- All category definitions (names, colors, visibility)
+- All supermarket definitions (names, order, visibility)
+- App settings: default tab, fullscreen preference, max product name length
+
+<Note>
+  Login credentials (email and authentication token) are **not** included in exported files. This is intentional — exports are safe to share or store without exposing your account details.
+</Note>
+
+### Exported JSON structure
+
+```json
+{
+  "appName": "Hungry!",
+  "maxLenght": 29,
+  "defaultTabActive": 2,
+  "alturaDisponible": 0,
+  "fullScreen": false,
+  "categorias": [
+    {
+      "id": 0,
+      "text": "Categoría 00",
+      "bgColor": "#d83c3d",
+      "visible": true,
+      "timestamp": "2024-01-01 00:00:00"
+    }
+  ],
+  "supermercados": [
+    {
+      "id": 0,
+      "text": "Cualquier Supermercado",
+      "logo": "hungry.svg",
+      "visible": true,
+      "order": 0,
+      "timestamp": "2024-01-01 00:00:00"
+    }
+  ],
+  "productos": [
+    {
+      "id": 0,
+      "text": "Leche",
+      "id_categoria": 2,
+      "id_supermercado": 1,
+      "selected": false,
+      "done": false,
+      "amount": 1,
+      "timestamp": "2024-03-15 10:30:00"
+    }
+  ],
+  "lastChangeTimestamp": 1710499800000
+}
+```
+
+The full `ImportData` type definition is:
+
+```typescript
+interface ImportData {
+  appName?: string;
+  maxLenght?: number;
+  defaultTabActive?: number;
+  alturaDisponible?: number;
+  fullScreen?: boolean;
+  loginData: LoginData;
+  supermercados?: Supermercado[];
+  categorias?: Categoria[];
+  productos?: Producto[];
+}
+```
+
+## Importing a configuration
+
+Clicking **Import Configuration** opens a file picker. Select a `.json` file previously exported from nHungry.
+
+The app validates the file before importing:
+
+1. The filename must contain the word `hungry` (case-insensitive).
+2. The file's `appName` field must equal `Hungry!`.
+
+If either check fails, the import is cancelled and an error is shown.
+
+### What gets restored
+
+When you confirm the import, a dialog asks whether you want to restore the full configuration or only the product data (products, categories, and supermarkets):
+
+- **Full configuration** — restores all products, categories, supermarkets, and settings (default tab, fullscreen, etc.)
+- **Data only** — restores products, categories, and supermarkets, leaving your current settings unchanged
+
+Your current login session is never replaced during an import. If the imported file contains login data from a different account, that data is discarded and your existing session is preserved.
+
+### How to import your data
+
+<Steps>
+  <Step title="Open the Config tab">
+    Navigate to the Config tab in nHungry.
+  </Step>
+  <Step title="Click Import Configuration">
+    Click **Import Configuration**. Your device's file picker will open.
+  </Step>
+  <Step title="Select your backup file">
+    Navigate to the `.json` file you previously exported and select it. The filename must contain `hungry`.
+  </Step>
+  <Step title="Choose what to restore">
+    A dialog will ask whether to import the full configuration or only the data (products, categories, supermarkets). Select the option that fits your needs.
+  </Step>
+  <Step title="Confirm the import">
+    The app will restore the selected data and show a success message. The Config tab UI updates immediately to reflect the imported settings.
+  </Step>
+</Steps>
+
+## Common use cases
+
+| Scenario | Recommended approach |
+|----------|----------------------|
+| Routine multi-device sync | Use [cloud sync](/account/cloud-sync) instead |
+| One-time transfer to a new device (before setting up sync) | Export on the old device, import on the new one |
+| Sharing a category or supermarket setup | Export and send the file; recipient imports data only |
+| Manual backup before resetting the app | Export first, then use **Reset App** |

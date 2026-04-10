@@ -1,0 +1,448 @@
+---
+title: "useStore: global state management"
+description: "Complete reference for useStore(), nHungry's reactive global state composable built on Nuxt useState() — state, computed values, and all actions."
+---
+
+`useStore()` (exported as `myStore`) is the single store for all application state in nHungry. It is a plain TypeScript function built on Nuxt's `useState()` primitive — no Pinia, no Vuex, no external store library. `useState()` provides shared reactive refs that persist across component re-renders and are safe in an SSR context. Because nHungry runs with `ssr: false`, the primary benefit here is the shared-ref behaviour: every component that calls `myStore()` receives the same reactive instances.
+
+Every mutation in the store calls `saveDataToLocalStorage()` internally, so the browser's localStorage is always in sync with the in-memory state. On startup, `app.vue` calls `store.importData(ls.getItem())` to restore persisted state.
+
+<Tip>
+  Import using the named export `myStore`, not `useStore`. The function is not a default export.
+</Tip>
+
+```typescript
+import { myStore } from '~/composables/useStore';
+
+const store = myStore();
+```
+
+## State
+
+The following reactive refs are exposed by the store. All are `Ref<T>` values from `useState()`.
+
+<AccordionGroup>
+
+  <Accordion title="Productos, categorias, supermercados">
+
+| Ref | Type | Default | Description |
+|---|---|---|---|
+| `productos` | `Ref<Producto[]>` | `[]` | All products in the shopping list. |
+| `categorias` | `Ref<Categoria[]>` | 20 default categories | All categories, each with a background colour and visibility flag. |
+| `supermercados` | `Ref<Supermercado[]>` | 4 default supermarkets | All supermarkets with logo, visibility, and display order. |
+
+**Type reference**
+
+```typescript
+interface Producto {
+  id: number;
+  text: string;
+  id_categoria: number;
+  id_supermercado: number;
+  selected: boolean;   // in the current shopping list
+  done: boolean;       // marked as purchased
+  amount: number;
+  timestamp?: string;  // 'YYYY-MM-DD HH:MM:SS'
+}
+
+interface Categoria {
+  id: number;
+  text: string;
+  bgColor: string;  // hex colour
+  visible: boolean;
+  timestamp?: string;
+}
+
+interface Supermercado {
+  id: number;
+  text: string;
+  logo: string;     // filename in /public
+  visible: boolean;
+  order: number;    // display order (0 = always first)
+  timestamp?: string;
+}
+```
+
+  </Accordion>
+
+  <Accordion title="Login data">
+
+| Ref | Type | Default | Description |
+|---|---|---|---|
+| `loginData` | `Ref<LoginData>` | `{ email: '', token: '', fingerID: '', logged: false }` | Authentication state for the current session. |
+
+```typescript
+interface LoginData {
+  email: string;
+  token: string;      // JWT Bearer token
+  fingerID: string;   // Device fingerprint
+  logged: boolean;
+}
+```
+
+  </Accordion>
+
+  <Accordion title="App configuration">
+
+| Ref | Type | Default | Description |
+|---|---|---|---|
+| `appName` | `Ref<string>` | `'Hungry!'` | Display name of the app (shown in the UI). |
+| `fullScreen` | `Ref<boolean>` | `false` | Whether the app is in full-screen mode. |
+| `defaultTabActive` | `Ref<number>` | `2` | Index of the tab that opens on startup. |
+| `maxLenght` | `Ref<number>` | `29` | Maximum character length for product names. |
+| `alturaDisponible` | `Ref<number>` | `0` | Available viewport height in pixels (computed at runtime). |
+| `ignoreDrag` | `Ref<boolean>` | `false` | When `true`, drag-and-drop is disabled globally. |
+| `lastSyncTimestamp` | `Ref<number \| null>` | `Date.now()` | Unix timestamp (ms) of the last successful cloud sync. |
+
+  </Accordion>
+
+  <Accordion title="Static data">
+
+| Property | Type | Description |
+|---|---|---|
+| `tabs` | `Tab[]` | Static array of the five application tabs. Not a reactive ref — it does not change at runtime. |
+| `bgColors` | `string[]` | Palette of 20 hex colours used for category backgrounds. |
+
+```typescript
+interface Tab {
+  id: number;
+  text: string;       // display label
+  page: string;       // key used for component lookup and currentPage ref
+  logo: string;       // SVG filename in /public
+  selectable: boolean;
+}
+```
+
+  </Accordion>
+
+</AccordionGroup>
+
+## Computed
+
+<AccordionGroup>
+
+  <Accordion title="sortedA2Z">
+
+Returns all products belonging to visible categories, sorted alphabetically by name.
+
+```typescript
+const sortedA2Z: ComputedRef<Producto[]>
+```
+
+Products in hidden categories are excluded. The sort uses `String.localeCompare` for correct locale-aware ordering.
+
+```typescript
+const store = myStore();
+// All visible products, A–Z
+const list = store.sortedA2Z.value;
+```
+
+  </Accordion>
+
+  <Accordion title="sortedByCategory">
+
+Returns all products belonging to visible categories, sorted first by `id_categoria` (ascending) and then alphabetically within each category.
+
+```typescript
+const sortedByCategory: ComputedRef<Producto[]>
+```
+
+```typescript
+const store = myStore();
+// Group products by category for the category tab
+const list = store.sortedByCategory.value;
+```
+
+  </Accordion>
+
+  <Accordion title="purchased">
+
+Returns all products where `done === true` and whose category is currently visible.
+
+```typescript
+const purchased: ComputedRef<Producto[]>
+```
+
+```typescript
+const store = myStore();
+// Products that have been marked as purchased
+const cart = store.purchased.value;
+```
+
+  </Accordion>
+
+</AccordionGroup>
+
+## Actions
+
+<AccordionGroup>
+
+  <Accordion title="Product actions">
+
+**`addProduct(name, category_id, supermarket_id)`**
+
+Creates a new product with `selected: false`, `done: false`, and `amount: 1`. The `id` is `max(existing ids) + 1`, or `0` for the first product.
+
+```typescript
+store.addProduct('Whole milk', 0, 2);
+```
+
+---
+
+**`updateProduct(id, newData)`**
+
+Merges `newData` into the product with the given `id` using `Object.assign`.
+
+```typescript
+store.updateProduct(5, { text: 'Skimmed milk', amount: 2 });
+```
+
+---
+
+**`updateProductos(newProductos)`**
+
+Replaces the entire `productos` array and saves to localStorage. Use this for bulk updates.
+
+```typescript
+store.updateProductos(reorderedList);
+```
+
+---
+
+**`toggleSelected(id)`**
+
+Toggles the `selected` flag. When selecting a product (`selected` becomes `true`), `done` is also set to `false` to prevent the product from appearing as purchased while it is still in the list.
+
+```typescript
+store.toggleSelected(3);
+```
+
+---
+
+**`toggleDone(id)`**
+
+Toggles the `done` (purchased) flag. Updates the product's timestamp to the current time.
+
+```typescript
+store.toggleDone(3);
+```
+
+---
+
+**`setAmount(id, amount)`**
+
+Sets the quantity for a product.
+
+```typescript
+store.setAmount(3, 4);
+```
+
+---
+
+**`clearList(onlyDone)`**
+
+- `clearList(true)` — resets only products where `done: true`, setting `selected: false` and `done: false`.
+- `clearList(false)` — resets all products where `selected: true`, setting `selected: false` and `done: false`.
+
+```typescript
+// Remove purchased items from the cart
+store.clearList(true);
+```
+
+  </Accordion>
+
+  <Accordion title="Category actions">
+
+**`updateCategoria(id, newText)`**
+
+Updates the display name of a category.
+
+```typescript
+store.updateCategoria(2, 'Bakery');
+```
+
+---
+
+**`updateCategorias(visibleCategoriaIds)`**
+
+Sets the `visible` flag on all categories. Categories whose IDs are in the array become visible; all others are hidden.
+
+```typescript
+store.updateCategorias([0, 1, 3, 5]);
+```
+
+---
+
+**`setVisibleCategoria(id, visible)`**
+
+Sets the `visible` flag for a single category.
+
+```typescript
+store.setVisibleCategoria(4, false);
+```
+
+  </Accordion>
+
+  <Accordion title="Supermarket actions">
+
+**`addMarket(market)`**
+
+Appends a new supermarket to the list. Assigns `order = supermercados.length` before inserting, then re-sorts by `order`.
+
+```typescript
+import type { Supermercado } from '~/types';
+
+const newMarket: Supermercado = {
+  id: 5,
+  text: 'Aldi',
+  logo: 'aldi.svg',
+  visible: true,
+  order: 0,  // will be overwritten
+};
+store.addMarket(newMarket);
+```
+
+---
+
+**`setMarketVisible(id, visible)`**
+
+Shows or hides a single supermarket.
+
+```typescript
+store.setMarketVisible(2, false);
+```
+
+---
+
+**`setMarketOrder(id, directionUp)`**
+
+Moves a supermarket one position up (`true`) or down (`false`) in the display order. The entry with `id === 0` is always pinned to first position and cannot be moved.
+
+```typescript
+store.setMarketOrder(3, true); // move up
+```
+
+---
+
+**`updateSupermercados(visibleIds)`**
+
+Sets visibility for all supermarkets based on an array of visible IDs, then re-sorts by `order`.
+
+```typescript
+store.updateSupermercados([0, 1, 3]);
+```
+
+---
+
+**`updateSupermercadosOrder(newSupermercados)`**
+
+Replaces the entire supermarket array and recalculates `order` from each item's position in the array. The item with `id === 0` keeps its original order value.
+
+```typescript
+store.updateSupermercadosOrder(reorderedList);
+```
+
+  </Accordion>
+
+  <Accordion title="Auth actions">
+
+**`setEmail(email)`** / **`setToken(token)`** / **`setFingerID(fingerID)`** / **`setLogged(logged)`**
+
+Individual setters for fields in `loginData`. Each one saves to localStorage.
+
+```typescript
+store.setEmail('user@example.com');
+store.setToken('eyJ...');
+store.setFingerID('a1b2c3');
+store.setLogged(true);
+```
+
+  </Accordion>
+
+  <Accordion title="UI and settings actions">
+
+**`setFullscreen(fullscreen)`**
+
+Sets the `fullScreen` ref and persists it.
+
+```typescript
+store.setFullscreen(true);
+```
+
+---
+
+**`setDefaultTabActive(tabIndex)`**
+
+Sets which tab index opens by default on the next app load.
+
+```typescript
+store.setDefaultTabActive(1); // open "Add Products" by default
+```
+
+  </Accordion>
+
+  <Accordion title="Data import/export and reset">
+
+**`exportData()`**
+
+Returns a plain object containing `appName`, `maxLenght`, `defaultTabActive`, `alturaDisponible`, `fullScreen`, `categorias`, `supermercados`, `productos`, and a `lastChangeTimestamp`. This is the payload sent to the server during sync.
+
+```typescript
+const snapshot = store.exportData();
+console.log(snapshot.productos.length);
+```
+
+---
+
+**`importData(data)`**
+
+Accepts an `ImportData` object and merges it into the store. Handles missing timestamps by backfilling a default value. Returns `true` on success, `false` if an exception is thrown.
+
+```typescript
+import type { ImportData } from '~/types';
+
+const ok = store.importData(remoteData as ImportData);
+```
+
+---
+
+**`resetToDefaults()`**
+
+Performs a factory reset: clears all products, restores the four default supermarkets and twenty default categories, clears login data, and resets settings. Saves everything to localStorage.
+
+```typescript
+store.resetToDefaults();
+```
+
+  </Accordion>
+
+  <Accordion title="Lookup helpers">
+
+Three convenience finders that return the first matching item or `undefined`:
+
+```typescript
+const product     = store.findProducto(id);      // Producto | undefined
+const supermarket = store.findSupermercado(id);   // Supermercado | undefined
+const category    = store.findCategoria(id);      // Categoria | undefined
+```
+
+  </Accordion>
+
+</AccordionGroup>
+
+## Related pages
+
+<CardGroup cols={2}>
+  <Card title="Composables reference" icon="puzzle-piece" href="/development/composables">
+    All other composables that read from and write to the store.
+  </Card>
+  <Card title="Architecture overview" icon="sitemap" href="/development/architecture">
+    How the store fits into the overall data flow.
+  </Card>
+  <Card title="Import and export" icon="file-arrow-up" href="/configuration/import-export">
+    How users export and import the data that `exportData()` and `importData()` produce.
+  </Card>
+  <Card title="Cloud sync" icon="arrows-rotate" href="/account/cloud-sync">
+    How `exportData()` and `importData()` are used during sync.
+  </Card>
+</CardGroup>

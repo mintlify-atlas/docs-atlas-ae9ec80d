@@ -1,0 +1,112 @@
+---
+title: "nHungry: Organize your shopping list with ease"
+description: "nHungry is a Nuxt 3 PWA for managing shopping lists across multiple supermarkets, with color-coded categories, offline support, and optional cloud sync."
+---
+
+nHungry is a progressive web app that helps you build, organize, and work through your grocery shopping. This page gives you an overview of what nHungry does, how the interface is structured, and the core data types the app works with.
+
+## Overview
+
+nHungry is built for anyone who shops at more than one store and wants their list to reflect that. You define your own categories and supermarkets, add products to them, and when you go shopping the app filters your list by store so you only see what you need in that moment.
+
+All your data is stored locally in the browser. You can optionally register an account and sync your list to the cloud so it stays consistent across devices.
+
+The live app is available at [hungry.infoinnova.es](https://hungry.infoinnova.es). You can also [run it locally](/installation) if you want to self-host or contribute.
+
+## Key features
+
+<CardGroup cols={2}>
+  <Card title="Color-coded categories" icon="palette">
+    20 renameable categories, each with a distinct background color, so you can visually group products at a glance.
+  </Card>
+  <Card title="Multiple supermarkets" icon="store">
+    Add as many supermarkets as you need and reorder them with drag-and-drop. Filter your cart by store when you go shopping.
+  </Card>
+  <Card title="PWA with offline support" icon="wifi-slash">
+    Install nHungry to your home screen and use it without an internet connection. Data persists in LocalStorage.
+  </Card>
+  <Card title="Cloud sync" icon="cloud">
+    Register an account and sync your list across devices via a REST API with JWT authentication.
+  </Card>
+  <Card title="Import and export" icon="file-arrow-up">
+    Back up your entire list, categories, and supermarkets to a JSON file, and restore it on any device.
+  </Card>
+  <Card title="Device fingerprinting" icon="fingerprint">
+    FingerprintJS identifies your device automatically, so login is seamless without storing passwords locally.
+  </Card>
+</CardGroup>
+
+## The five tabs
+
+The app is organized into five tabs, accessible from the navigation bar at the top of the screen.
+
+**Config** — Application settings: rename the app, set the default tab, manage categories and supermarkets, handle import/export, and manage your account and cloud sync.
+
+**Add Products** — The main entry point for adding items to your list. Choose a category, choose a supermarket, type a name, and add it.
+
+**A-Z** — Alphabetical view of all products currently on your list. Useful for quickly finding or selecting items without caring about category order.
+
+**Categories** — Products grouped by category. Each group shows the category name and color, making it easy to scan a structured list.
+
+**Cart** — Your shopping view. Shows only products you have selected (marked for shopping), filtered by supermarket. Tap an item to mark it as bought.
+
+## Data model
+
+nHungry's store is built around three core types defined in `types/index.ts`.
+
+### Producto
+
+Represents a single item on your list.
+
+| Field | Type | Description |
+|---|---|---|
+| `id` | `number` | Unique identifier. |
+| `text` | `string` | Product name. |
+| `id_categoria` | `number` | Reference to a `Categoria`. |
+| `id_supermercado` | `number` | Reference to a `Supermercado`. |
+| `selected` | `boolean` | Whether the item is in the cart for this shopping trip. |
+| `done` | `boolean` | Whether the item has been marked as bought in the cart. |
+| `amount` | `number` | Quantity to buy. |
+| `timestamp` | `string` | Last modified time in `YYYY-MM-DD HH:MM:SS` format. |
+
+### Categoria
+
+Represents one of the 20 color-coded product categories.
+
+| Field | Type | Description |
+|---|---|---|
+| `id` | `number` | Unique identifier (0–19). |
+| `text` | `string` | Display name. Defaults to `Categoría 00` through `Categoría 19`. |
+| `bgColor` | `string` | Hex background color for the category badge. |
+| `visible` | `boolean` | Whether products in this category appear in list views. |
+| `timestamp` | `string` | Last modified time in `YYYY-MM-DD HH:MM:SS` format. |
+
+### Supermercado
+
+Represents a supermarket that products can be assigned to.
+
+| Field | Type | Description |
+|---|---|---|
+| `id` | `number` | Unique identifier. |
+| `text` | `string` | Display name. |
+| `logo` | `string` | Filename of the supermarket's logo image. |
+| `visible` | `boolean` | Whether this supermarket is shown in filters. |
+| `order` | `number` | Sort position. The generic "Any supermarket" entry (`id: 0`) always appears first. |
+| `timestamp` | `string` | Last modified time in `YYYY-MM-DD HH:MM:SS` format. |
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    Follow a complete walkthrough from opening the app to finishing your first shopping trip.
+  </Card>
+  <Card title="Installation" icon="terminal" href="/installation">
+    Run nHungry locally for development or self-hosting.
+  </Card>
+  <Card title="Adding products" icon="plus" href="/using-the-app/adding-products">
+    Learn how to add and manage products on your list.
+  </Card>
+  <Card title="Categories and supermarkets" icon="tags" href="/using-the-app/categories-and-supermarkets">
+    Customize categories and manage your supermarkets.
+  </Card>
+</CardGroup>

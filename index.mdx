@@ -1,97 +1,67 @@
 ---
-title: "Introduction"
-description: "Welcome to the new home for your documentation"
+title: "nHungry — Shopping list app with sync and offline support"
+description: "nHungry is a Nuxt.js PWA for organizing your shopping list across supermarkets, with color-coded categories, offline mode, and cloud sync."
 ---
 
-## Setting up
+nHungry is a fast, mobile-friendly shopping list app built with Nuxt.js. Organize products by color-coded categories, assign them to specific supermarkets, browse alphabetically or by category, and sync your list across devices — all with offline support so it works even without an internet connection.
 
-Get your documentation site up and running in minutes.
-
-<Card
-  title="Start here"
-  icon="rocket"
-  href="/quickstart"
-  horizontal
->
-  Follow our three step quickstart guide.
-</Card>
-
-## Make it yours
-
-Design a docs site that looks great and empowers your users.
-
-<Columns cols={2}>
-  <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
-  >
-    Edit your docs locally and preview them in real time.
+<CardGroup cols={2}>
+  <Card title="Quick start" icon="rocket" href="/quickstart">
+    Get nHungry running in your browser in under five minutes.
   </Card>
-  <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
-  >
-    Customize the design and colors of your site to match your brand.
+  <Card title="Adding products" icon="cart-plus" href="/using-the-app/adding-products">
+    Learn how to add, categorize, and assign products to supermarkets.
   </Card>
-    <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
+  <Card title="Shopping cart" icon="basket-shopping" href="/using-the-app/shopping-cart">
+    Take your list to the store — filter by supermarket, mark items as bought.
   </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-  >
-    Auto-generate API documentation from OpenAPI specifications.
+  <Card title="Cloud sync" icon="cloud-arrow-up" href="/account/cloud-sync">
+    Keep your list in sync across all your devices with one account.
   </Card>
-</Columns>
+</CardGroup>
 
-## Create beautiful pages
+## What you can do with nHungry
 
-Everything you need to create world-class documentation.
+nHungry covers every step of the shopping list workflow — from creating a product to checking it off at the checkout.
 
-<Columns cols={2}>
-  <Card
-    title="Write with MDX"
-    icon="pen-fancy"
-    href="/essentials/markdown"
-  >
-    Use MDX to style your docs pages.
+<CardGroup cols={3}>
+  <Card title="Organize by category" icon="tags">
+    20 color-coded categories you can rename to match your store layout.
   </Card>
-  <Card
-    title="Code samples"
-    icon="code"
-    href="/essentials/code"
-  >
-    Add sample code to demonstrate how to use your product.
+  <Card title="Multiple supermarkets" icon="store">
+    Assign products to specific supermarkets and filter your cart view accordingly.
   </Card>
-  <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
-  >
-    Display images and other media.
+  <Card title="Browse your way" icon="list">
+    View products alphabetically (A–Z) or grouped by category — whichever works for you.
   </Card>
-  <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
-  >
-    Write once and reuse across your docs.
+  <Card title="Works offline" icon="wifi-slash">
+    Installed as a PWA, nHungry works without an internet connection and syncs when you're back online.
   </Card>
-</Columns>
+  <Card title="Import & export" icon="file-arrow-up">
+    Back up your entire configuration as a JSON file and restore it any time.
+  </Card>
+  <Card title="Account sync" icon="rotate">
+    Register a free account to sync your products, categories, and supermarkets across devices.
+  </Card>
+</CardGroup>
 
-## Need inspiration?
+## Get started
 
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
-</Card>
+<Steps>
+  <Step title="Open the app">
+    Visit [hungry.infoinnova.es](https://hungry.infoinnova.es) in your browser, or follow the [installation guide](/installation) to run it locally.
+  </Step>
+  <Step title="Add your first product">
+    Tap the **Add** tab, choose a category and supermarket, type the product name, and tap **Add**. See [Adding products](/using-the-app/adding-products) for details.
+  </Step>
+  <Step title="Build your shopping list">
+    In the A–Z or Categories view, tap products to select them for your shopping list. Selected products appear in the **Cart** tab.
+  </Step>
+  <Step title="Shop and check off">
+    Open the **Cart** tab at the store. Filter by supermarket, and tap each product to mark it as bought. When done, clear the list to start fresh.
+  </Step>
+</Steps>
+
+<Tip>
+  Install nHungry as a PWA on your phone for the best experience — tap **Add to Home Screen** in your browser's share menu after opening the app.
+</Tip>

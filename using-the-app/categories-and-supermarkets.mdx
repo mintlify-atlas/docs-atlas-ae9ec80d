@@ -1,0 +1,95 @@
+---
+title: "Manage categories and supermarkets"
+description: "Organize your products using nHungry's 20 color-coded categories and multiple supermarkets, with full control over naming, visibility, and order."
+---
+
+nHungry structures your product catalogue around two organizing concepts: categories and supermarkets. Categories group products visually with distinct background colors, while supermarkets let you plan which store to visit for each item. Both systems are configurable — you can rename categories, reorder supermarkets, and hide the ones you don't use.
+
+<Tabs>
+  <Tab title="Categories">
+    ## Categories
+
+    nHungry provides 20 categories, each with a unique preset background color drawn from the app's color palette. By default they are named **Categoría 00** through **Categoría 19**, but you can rename every one to match how you think about your groceries.
+
+    ### Preset color palette
+
+    Each category is assigned one of 20 colors in the following order:
+
+    | Category | Default color |
+    |---|---|
+    | 00 | `#d83c3d` (red) |
+    | 01 | `#d8993c` (amber) |
+    | 02 | `#b9d83c` (yellow-green) |
+    | 03 | `#5bd83c` (green) |
+    | 04 | `#3dd87a` (mint) |
+    | 05 | `#47ffff` (cyan) |
+    | 06 | `#3b7ad7` (blue) |
+    | 07 | `#5b3cd8` (indigo) |
+    | 08 | `#b83cd8` (purple) |
+    | 09 | `#d83ba4` (pink) |
+    | 10–19 | Darker variants of the above |
+
+    Background colors are fixed — only the name is editable.
+
+    ### Renaming a category
+
+    1. Open the **Add** tab (the **+** icon in the navigation bar).
+    2. Long-press any category tile in the horizontal category picker.
+    3. A text input dialog opens pre-filled with the current name. Type the new name and tap **Aceptar**.
+    4. A notification confirms the rename. If you submit without changing the name, a separate notification confirms that no changes were made.
+
+    ### Controlling visibility
+
+    Each category has a visibility toggle in the **Config** tab. Hiding a category removes it from:
+
+    - The category picker in the **Add** tab
+    - The **A–Z** and **Categories** browsing views
+    - The **Cart** tab's product lists
+
+    Products assigned to a hidden category are not deleted — they are simply not shown until the category is made visible again.
+  </Tab>
+  <Tab title="Supermarkets">
+    ## Supermarkets
+
+    nHungry ships with four default supermarkets:
+
+    | Name | Role |
+    |---|---|
+    | **Cualquier Supermercado** | Generic fallback (id 0) — always first |
+    | **Carrefour** | Specific store |
+    | **Mercadona** | Specific store |
+    | **La Carmela** | Specific store |
+
+    ### The generic supermarket
+
+    **Cualquier Supermercado** (id 0) is a special entry that means "any store". It is always pinned to the top of every supermarket list and cannot be hidden or reordered. Products assigned to it appear in the **Cart** tab alongside whichever specific supermarket you have currently selected.
+
+    ### Reordering supermarkets
+
+    Open **Config** and drag supermarket entries up or down to change the order they appear in dropdowns and the cart filter. The generic supermarket always stays first regardless of drag position.
+
+    ### Toggling visibility
+
+    Each supermarket (except the generic one) has a visibility toggle in **Config**. Hidden supermarkets do not appear in:
+
+    - The supermarket dropdown on the **Add** tab
+    - The cart filter dropdown on the **Cart** tab
+
+    <Warning>
+      If you hide a supermarket that already has products assigned to it, those products are treated as belonging to **Cualquier Supermercado** in the cart view. They will appear alongside generic products for whichever store you select, rather than being grouped separately. Unhiding the supermarket restores the original grouping.
+    </Warning>
+
+    ### Adding a supermarket
+
+    Additional supermarkets can be added from the **Config** tab. Each new entry is appended after the existing ones and can be reordered by dragging.
+  </Tab>
+</Tabs>
+
+<CardGroup cols={2}>
+  <Card title="Adding products" icon="cart-plus" href="/using-the-app/adding-products">
+    Assign a category and supermarket when creating a product.
+  </Card>
+  <Card title="App settings" icon="gear" href="/configuration/app-settings">
+    Configure category visibility and supermarket order in the Config tab.
+  </Card>
+</CardGroup>

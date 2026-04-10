@@ -1,80 +1,85 @@
 ---
-title: "Quickstart"
-description: "Start building awesome documentation in minutes"
+title: "Get started with nHungry"
+description: "Walk through the complete nHungry workflow — from opening the app and adding your first product to selecting items and finishing a shopping trip."
 ---
 
-## Get started in three steps
+This quickstart walks you through the complete nHungry workflow: opening the app, setting up your list, browsing products, and shopping. By the end you will have added your first product, selected it for your cart, and marked it as bought.
 
-Get your documentation site running locally and make your first customization.
+<Tip>
+  You can use nHungry immediately without installing anything. Open [hungry.infoinnova.es](https://hungry.infoinnova.es) in any modern browser. To get the full offline experience, install it as a PWA — your browser will show an "Add to home screen" or "Install app" prompt.
+</Tip>
 
-### Step 1: Set up your local environment
+<Steps>
+  <Step title="Open the app">
+    Go to [hungry.infoinnova.es](https://hungry.infoinnova.es) or, if you're running locally, open [http://localhost:3000](http://localhost:3000).
 
-<AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
-    
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
-  </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
-    
-    <Tip>Your preview updates automatically as you edit files.</Tip>
-  </Accordion>
-</AccordionGroup>
+    The app loads and reads your data from LocalStorage. On your first visit there is no saved data, so nHungry initializes with default values automatically.
+  </Step>
 
-### Step 2: Deploy your changes
+  <Step title="Review the default categories and supermarkets">
+    The app starts with 20 color-coded categories named **Categoría 00** through **Categoría 19**, and four default supermarkets: **Cualquier Supermercado**, **Carrefour**, **Mercadona**, and **La Carmela**.
 
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
-    
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
+    You can rename categories and supermarkets any time from the **Config** tab. For now, the defaults are enough to add your first product.
+  </Step>
 
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
+  <Step title="Add your first product">
+    Tap the **Add Products** tab (the second icon in the navigation bar).
 
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
+    1. Select a category from the category picker. Each category shows its color badge and name.
+    2. Select a supermarket from the supermarket picker. Choose **Cualquier Supermercado** if the item is not store-specific.
+    3. Type the product name in the text field.
+    4. Tap **Add** to save it to your list.
 
-### Step 3: Go live
+    The product is saved to LocalStorage immediately. You do not need to confirm or save manually.
+  </Step>
 
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
+  <Step title="Browse your list">
+    You have two ways to view your products:
 
-## Next steps
+    - **A-Z tab** — all products sorted alphabetically, regardless of category. Good for quickly finding a specific item.
+    - **Categories tab** — products grouped by their category, each group showing the category color. Good for scanning a structured list.
 
-Now that you have your docs running, explore these key features:
+    Both views respect the category visibility setting — categories toggled off in **Config** are hidden from both views.
+  </Step>
+
+  <Step title="Select products for your cart">
+    In the **A-Z** or **Categories** tab, tap a product to select it for your shopping trip. Selected products are visually marked and will appear in the **Cart** tab.
+
+    Tap a product again to deselect it. You can select as many products as you need before heading to the store.
+  </Step>
+
+  <Step title="Go shopping with the cart">
+    Tap the **Cart** tab (the last icon in the navigation bar).
+
+    The cart shows all selected products. Use the supermarket filter at the top to display only the products assigned to the store you are currently in. This lets you work through one store at a time without seeing irrelevant items.
+  </Step>
+
+  <Step title="Mark items as bought">
+    In the **Cart** tab, tap a product to mark it as bought. Bought items are visually distinguished from items still to pick up.
+
+    Tap a bought item again to unmark it if you need to.
+  </Step>
+
+  <Step title="Clear the list when you're done">
+    In the **Cart** tab, tap **Limpiar Lista** (Clear list) in the top bar. A dialog lets you choose to clear only the purchased items, or all selected items at once.
+
+    Your categories, supermarkets, and product definitions remain intact — only the `selected` and `done` state is reset.
+  </Step>
+</Steps>
+
+## What's next
 
 <CardGroup cols={2}>
-
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
-
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
-
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
-
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
-
+  <Card title="Adding products" icon="plus" href="/using-the-app/adding-products">
+    Learn about all the options available when adding products to your list.
+  </Card>
+  <Card title="Shopping cart" icon="cart-shopping" href="/using-the-app/shopping-cart">
+    Explore cart filtering and the bought-item workflow in detail.
+  </Card>
+  <Card title="Categories and supermarkets" icon="tags" href="/using-the-app/categories-and-supermarkets">
+    Rename categories, change colors, add supermarkets, and reorder them.
+  </Card>
+  <Card title="Cloud sync" icon="cloud" href="/account/cloud-sync">
+    Register an account and keep your list in sync across devices.
+  </Card>
 </CardGroup>
-
-<Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
-</Note>

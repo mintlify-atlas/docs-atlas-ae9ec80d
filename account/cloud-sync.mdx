@@ -1,0 +1,65 @@
+---
+title: "Sync your shopping list across devices"
+description: "Use nHungry's cloud sync to keep products, categories, and supermarkets consistent across all your devices — tap Sync Data in the Config tab."
+---
+
+Cloud sync lets you keep your nHungry data consistent across phones, tablets, and browsers. When you trigger a sync, nHungry sends your local data to the server, which merges it with any data from your other devices and returns the combined result. Use it whenever you add products on one device and want them available on another.
+
+<Note>
+  Each product, category, and supermarket has a timestamp that the server uses to resolve conflicts during the merge. The most recently modified version of an item wins.
+</Note>
+
+## Before you sync
+
+You must be logged in to use cloud sync. If the **Sync Data** button is not visible in the **Config** tab, tap **Register / Log In** first. See [Register and log in](/account/registration-login) for instructions.
+
+## How to sync
+
+<Steps>
+  <Step title="Open the Config tab">
+    Tap the **Config** tab at the bottom of the screen.
+  </Step>
+  <Step title="Tap Sync Data">
+    Tap the **Sync Data** button. The button label changes to "Syncing..." while the operation is in progress.
+  </Step>
+  <Step title="Wait for the result">
+    When the sync completes, the last sync time is shown below the button. If the sync fails, the status changes to an error state — check your connection and try again.
+  </Step>
+</Steps>
+
+<Tip>
+  Sync before you start making changes on a new device, and again after you're done. This ensures the server always has your latest data and that any changes from another device are pulled in before you start editing.
+</Tip>
+
+## What gets synced
+
+| Data | Synced |
+|------|--------|
+| Products | Yes |
+| Categories | Yes |
+| Supermarkets | Yes |
+| Login credentials | No |
+| App settings | No |
+
+Your email, token, and device fingerprint are never included in the synced data payload.
+
+## How the sync works
+
+<Steps>
+  <Step title="Export local data">
+    nHungry collects your current products, categories, and supermarkets — each with its last-modified timestamp.
+  </Step>
+  <Step title="Send to server">
+    The data is sent to `POST /syncData` along with your email, token, and device fingerprint for authentication.
+  </Step>
+  <Step title="Server merges">
+    The server compares your local data with any data it has stored from your other devices and produces a merged result using the timestamps to resolve conflicts.
+  </Step>
+  <Step title="Receive merged data">
+    The server returns the merged dataset. nHungry imports it, replacing your local state with the reconciled version.
+  </Step>
+</Steps>
+
+## Offline behaviour
+
+If you tap **Sync Data** while offline, the request will fail gracefully and the status will show an error. Your local data is not lost. Wait until you have an internet connection and tap **Sync Data** again.

@@ -1,0 +1,83 @@
+---
+title: "Configure nHungry app settings"
+description: "Manage category visibility, supermarket order, default tab, and fullscreen mode from the Config tab to personalize how nHungry looks and behaves."
+---
+
+The Config tab is your control center for personalizing nHungry. From here you can choose which categories and supermarkets appear across the app, decide which tab opens when you launch it, and toggle fullscreen mode. Any change you make in this tab only takes effect after you click **Save Changes**.
+
+## Category visibility
+
+nHungry supports up to 20 categories. By default all categories are visible, but you can hide ones you don't use to keep the add-product form and browse views uncluttered.
+
+Each category appears as a labeled checkbox. Checked categories are shown throughout the app; unchecked ones are hidden.
+
+<Warning>
+  At least one category must remain checked. If you attempt to uncheck the last visible category, the app will prevent the action.
+</Warning>
+
+## Supermarket visibility and ordering
+
+The supermarket list shows all supermarkets as checkboxes with a drag handle next to each one. You can hide supermarkets you don't shop at and rearrange the ones you keep.
+
+- Toggle a supermarket's checkbox to show or hide it.
+- Drag the grip icon on the right to reorder supermarkets.
+
+**Cualquier Supermercado** (the generic "any supermarket" entry) is always pinned to the top of the list and cannot be moved or hidden.
+
+<Warning>
+  You cannot have exactly one named supermarket visible — the app requires either none or at least two. If you try to save with exactly one named supermarket checked, you will see an error and your changes will not be saved.
+</Warning>
+
+## Default tab
+
+Use the dropdown to select which tab opens when you launch nHungry. Only tabs that are marked as selectable appear in the list:
+
+| Tab | Description |
+|-----|-------------|
+| Add | The product entry form |
+| A–Z | Alphabetical product list |
+| Categories | Products grouped by category |
+| Cart | Your active shopping list |
+
+The Config tab itself is not available as a default tab.
+
+## Fullscreen mode
+
+The fullscreen toggle switches nHungry into a full-screen display mode. The checkbox label updates to reflect the current state: "Ejecutar a pantalla completa" when enabled, "No ejecutar a pantalla completa" when disabled.
+
+## Saving your changes
+
+<Warning>
+  Changes made in the Config tab are not saved automatically. If you navigate away from the tab before clicking **Save Changes**, all unsaved changes will be lost.
+</Warning>
+
+<Steps>
+  <Step title="Open the Config tab">
+    Tap the settings icon (gear/config tab) at the top of the app.
+  </Step>
+  <Step title="Adjust your settings">
+    Toggle category checkboxes, reorder or toggle supermarkets, pick a default tab from the dropdown, and toggle fullscreen mode as needed.
+  </Step>
+  <Step title="Save your changes">
+    Click **Save Changes**. A confirmation message will appear when your settings have been written to storage. The changes take effect immediately.
+  </Step>
+</Steps>
+
+## Resetting the app
+
+**Reset App** returns nHungry to its factory defaults. This action clears every product you have added and restores all categories, supermarkets, and settings to their original values.
+
+<Warning>
+  Resetting the app is irreversible. All products will be permanently deleted and all settings will be restored to their defaults. This cannot be undone. Export your data first if you want to keep a backup — see [Import and export your nHungry data](/configuration/import-export).
+</Warning>
+
+## Frequently asked questions
+
+<AccordionGroup>
+  <Accordion title="Why can't I uncheck all categories?">
+    At least one category must remain visible at all times. The app uses visible categories to filter which products appear in the A–Z, Categories, and Cart views. With no visible categories, no products would ever display. If you try to uncheck the last remaining category, the action is blocked.
+  </Accordion>
+  <Accordion title="Why can't I have exactly one supermarket visible?">
+    The app enforces a rule that the named supermarket list must contain either zero visible entries or two or more. Having exactly one named supermarket selected is not allowed. If you attempt to save this configuration, you will see an error message asking you to either add another supermarket to your selection or remove the single one you have selected.
+  </Accordion>
+</AccordionGroup>
